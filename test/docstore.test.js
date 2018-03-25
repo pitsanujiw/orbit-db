@@ -39,7 +39,9 @@ Object.keys(testAPIs).forEach(API => {
 
     it('creates and opens a database', async () => {
       db = await orbitdb1.docstore('first doc database')
-      db = await orbitdb1.docstore('first doc database')
+      assert.notEqual(db, null)
+      assert.equal(db.type, 'docstore')
+      assert.equal(db.dbname, 'first doc database')
     })
 
     describe('Default index \'_id\'', function() {

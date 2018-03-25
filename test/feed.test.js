@@ -43,8 +43,14 @@ Object.keys(testAPIs).forEach(API => {
 
     describe('Feed', function() {
       it('creates and opens a database', async () => {
-        db = await orbitdb1.feed('first database')
-        db = await orbitdb1.feed('first database')
+        db = await orbitdb1.feed('feed database')
+        assert.notEqual(db, null)
+        assert.equal(db.type, 'feed')
+        assert.equal(db.dbname, 'feed database')
+      })
+
+      it('returns 0 items when it\'s a fresh database', async () => {
+        db = await orbitdb1.feed('feed database')
         const items = db.iterator({ limit: -1 }).collect()
         assert.equal(items.length, 0)
       })

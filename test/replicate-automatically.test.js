@@ -45,10 +45,10 @@ Object.keys(testAPIs).forEach(API => {
     })
 
     after(async () => {
-      if(orbitdb1) 
+      if(orbitdb1)
         await orbitdb1.stop()
 
-      if(orbitdb2) 
+      if(orbitdb2)
         await orbitdb2.stop()
 
       if (ipfsd1)
@@ -142,7 +142,6 @@ Object.keys(testAPIs).forEach(API => {
         db2.events.on('replicate.progress', (address, hash, entry) => {
           try {
             // Check that the head we received from the first peer is the latest
-            // console.log(JSON.stringify(entry))
             assert.equal(entry.payload.op, 'ADD')
             assert.equal(entry.payload.key, null)
             assert.notEqual(entry.payload.value.indexOf('hello'), -1)

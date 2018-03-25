@@ -18,6 +18,8 @@ const goIpfs = {
 // IPFS daemons to run the tests with
 let testAPIs = Object.assign({}, jsIpfs)
 
+// By default, we only run tests against js-ipfs.
+// Setting env variable 'TEST=all' will make tests run with go-ipfs also.
 if (process.env.TEST === 'all')
   testAPIs = Object.assign({}, testAPIs, goIpfs)
 

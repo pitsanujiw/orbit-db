@@ -7,7 +7,7 @@ const KeyValueStore = require('orbit-db-kvstore')
 const CounterStore = require('orbit-db-counterstore')
 const DocumentStore = require('orbit-db-docstore')
 const Pubsub = require('orbit-db-pubsub')
-const Channel = require('ipfs-pubsub-dc')
+const Channel = require('ipfs-pubsub-1on1')
 const Cache = require('orbit-db-cache')
 const Keystore = require('orbit-db-keystore')
 const AccessController = require('./ipfs-access-controller')
@@ -126,11 +126,11 @@ class OrbitDB {
       accessController: accessController, 
       keystore: this.keystore,
       cache: cache,
+      onClose: this._onClose.bind(this),
     })
 
     const store = new Store(this._ipfs, this.id, address, opts)
     store.events.on('write', this._onWrite.bind(this))
-    store.events.on('closed', this._onClosed.bind(this))
 
     // ID of the store is the address as a string
     const addr = address.toString()
@@ -153,7 +153,8 @@ class OrbitDB {
     const store = this.stores[address]
     try {
       logger.debug(`Received ${heads.length} heads for '${address}':\n`, JSON.stringify(heads.map(e => e.hash), null, 2))
-      await store.sync(heads)
+      if (store)
+        await store.sync(heads)
     } catch (e) {
       logger.error(e)
     }
@@ -181,9 +182,9 @@ class OrbitDB {
       // Send the newly connected peer our latest heads
       let heads = store._oplog.heads
       if (heads.length > 0) {
-        logger.debug(`Send latest heads of '${address}':\n`, JSON.stringify(heads.map(e => e.hash), null, 2))
         // Wait for the direct channel to be fully connected
         await channel.connect()
+        logger.debug(`Send latest heads of '${address}':\n`, JSON.stringify(heads.map(e => e.hash), null, 2))
         channel.send(JSON.stringify(heads))
       }
       store.events.emit('peer', peer)
@@ -193,11 +194,8 @@ class OrbitDB {
   }
 
   // Callback when database was closed
-  _onClosed (address) {
-    logger.debug(`Database '${address}' was closed`)
-
-    // Remove the callback from the database
-    this.stores[address].events.removeAllListeners('closed')
+  _onClose (address) {
+    logger.debug(`Close ${address}`)
 
     // Unsubscribe from pubsub
     if(this._pubsub)

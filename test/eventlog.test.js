@@ -43,8 +43,14 @@ Object.keys(testAPIs).forEach(API => {
 
     describe('Eventlog', function () {
       it('creates and opens a database', async () => {
-        db = await orbitdb1.eventlog('first database')
-        db = await orbitdb1.eventlog('first database')
+        db = await orbitdb1.eventlog('log database')
+        assert.notEqual(db, null)
+        assert.equal(db.type, 'eventlog')
+        assert.equal(db.dbname, 'log database')
+      })
+
+      it('returns 0 items when it\'s a fresh database', async () => {
+        db = await orbitdb1.eventlog('log database')
         const items = db.iterator({ limit: -1 }).collect()
         assert.equal(items.length, 0)
       })
@@ -59,6 +65,8 @@ Object.keys(testAPIs).forEach(API => {
       })
 
       it('returns the added entry\'s hash, 2 entries', async () => {
+        db = await orbitdb1.eventlog('first database')
+        await db.load()
         const prevHash = db.iterator().collect()[0].hash
         const hash = await db.add('hello2')
         const items = db.iterator({ limit: -1 }).collect()

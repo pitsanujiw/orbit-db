@@ -43,7 +43,7 @@ Object.keys(testAPIs).forEach(API => {
     })
 
     after(async () => {
-      if(orbitdb) orbitdb.stop()
+      if (orbitdb) await orbitdb.stop()
       if (ipfsd) await stopIpfs(ipfsd)
       // Remove the added custom database type from OrbitDB
       // between js-ipfs and js-ipfs-api tests

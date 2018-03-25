@@ -48,7 +48,9 @@ Object.keys(testAPIs).forEach(API => {
 
     it('creates and opens a database', async () => {
       db = await orbitdb1.keyvalue('first kv database')
-      db = await orbitdb1.keyvalue('first kv database')
+      assert.notEqual(db, null)
+      assert.equal(db.type, 'keyvalue')
+      assert.equal(db.dbname, 'first kv database')
     })
 
     it('put', async () => {

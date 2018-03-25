@@ -52,7 +52,7 @@ Object.keys(testAPIs).forEach(API => {
         await stopIpfs(ipfsd1)
 
       if (ipfsd2)
-        await stopIpfs(ipfsd1)
+        await stopIpfs(ipfsd2)
     })
 
     beforeEach(() => {
@@ -60,16 +60,28 @@ Object.keys(testAPIs).forEach(API => {
       orbitdb2 = new OrbitDB(ipfs2, './orbitdb/2')
     })
 
-    afterEach(() => {
+    afterEach(async () => {
       if (orbitdb1)
-        orbitdb1.stop()
+        await orbitdb1.stop()
 
       if (orbitdb2)
-        orbitdb2.stop()
+        await orbitdb2.stop()
     })
 
     describe('counters', function() {
       let address
+
+      it('creates and opens a database', async () => {
+        const db = await orbitdb1.counter('counter database')
+        assert.notEqual(db, null)
+        assert.equal(db.type, 'counter')
+        assert.equal(db.dbname, 'counter database')
+      })
+
+      it('value is undefined when it\'s a fresh database', async () => {
+        const db = await orbitdb1.feed('counter database')
+        assert.equal(db.value, undefined)
+      })
 
       it('increases a counter value', async () => {
         const counter = await orbitdb1.counter('counter test', { path: dbPath1 })

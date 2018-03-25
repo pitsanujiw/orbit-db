@@ -39,7 +39,7 @@ Object.keys(testAPIs).forEach(API => {
 
     after(async () => {
       if(orbitdb) 
-        orbitdb.stop()
+        await orbitdb.stop()
 
       if (ipfsd)
         await stopIpfs(ipfsd)
