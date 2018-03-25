@@ -152,7 +152,8 @@ class OrbitDB {
   async _onMessage (address, heads) {
     const store = this.stores[address]
     try {
-      logger.debug(`Received ${heads.length} heads for '${address}':\n`, JSON.stringify(heads.map(e => e.hash), null, 2))
+      logger.debug(`Received ${heads.length} heads for ${address}:`)
+      heads.forEach(e => logger.debug(e.hash))
       if (store)
         await store.sync(heads)
     } catch (e) {
@@ -162,7 +163,8 @@ class OrbitDB {
 
   // Callback for when a peer connected to a database
   async _onPeerConnected (address, peer, room) {
-    logger.debug(`New peer '${peer}' connected to '${address}'`)
+    logger.debug(`New peer for ${address}`)
+    logger.debug(peer)
     const store = this.stores[address]
     if (store) {
       // Create a direct channel to the connected peer
